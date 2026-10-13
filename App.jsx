@@ -1,86 +1,68 @@
 import { useState } from "react";
 
 function App() {
-  const [search, setSearch] = useState("");
-  const [book, setBook] = useState(null);
+  const [task, setTask] = useState("");
+  const [tasks, setTasks] = useState([]);
+  const [editIndex, setEditIndex] = useState(null);
 
-  const books = [
-    {
-      title: "The Alchemist",
-      author: "Paulo Coelho",
-      year: 1988,
-      category: "Fiction"
-    },
-    {
-      title: "Atomic Habits",
-      author: "James Clear",
-      year: 2018,
-      category: "Self Help"
-    },
-    {
-      title: "Clean Code",
-      author: "Robert C. Martin",
-      year: 2008,
-      category: "Programming"
-    },
-    {
-      title: "Rich Dad Poor Dad",
-      author: "Robert Kiyosaki",
-      year: 1997,
-      category: "Finance"
+  // Add or Update Task
+  const handleSubmit = () => {
+    if (task === "") return;
+
+    if (editIndex === null) {
+      setTasks([...tasks, task]);
+    } else {
+      const updatedTasks = [...tasks];
+      updatedTasks[editIndex] = task;
+      setTasks(updatedTasks);
+      setEditIndex(null);
     }
-  ];
 
-  const searchBook = () => {
-    const value = search.trim().toLowerCase();
+    setTask("");
+  };
 
-    const result = books.find((item) =>
-      item.title.toLowerCase().includes(value)
-    );
+  // Edit Task
+  const handleEdit = (index) => {
+    setTask(tasks[index]);
+    setEditIndex(index);
+  };
 
-    setBook(result);
+  // Delete Task
+  const handleDelete = (index) => {
+    const updatedTasks = tasks.filter((_, i) => i !== index);
+    setTasks(updatedTasks);
   };
 
   return (
-    <div style={{ padding: "30px", fontFamily: "Arial" }}>
-      <h1>Book Finder</h1>
+    <div>
+      <h1>React To-Do List</h1>
 
       <input
         type="text"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        placeholder="Enter book name"
-        style={{ padding: "8px", width: "250px" }}
+        value={task}
+        onChange={(e) => setTask(e.target.value)}
+        placeholder="Enter task"
       />
 
-      <button
-        onClick={searchBook}
-        style={{ padding: "8px 15px", marginLeft: "5px" }}
-      >
-        Search
+      <button onClick={handleSubmit}>
+        {editIndex === null ? "Add" : "Update"}
       </button>
 
-      {book && (
-        <div style={{ marginTop: "25px" }}>
-          <h2>{book.title}</h2>
+      <ul>
+        {tasks.map((item, index) => (
+          <li key={index}>
+            {item}
 
-          <p>
-            <b>Author:</b> {book.author}
-          </p>
+            <button onClick={() => handleEdit(index)}>
+              Edit
+            </button>
 
-          <p>
-            <b>Published Year:</b> {book.year}
-          </p>
-
-          <p>
-            <b>Category:</b> {book.category}
-          </p>
-        </div>
-      )}
-
-      {search && !book && (
-        <p style={{ color: "red" }}>Book not found</p>
-      )}
+            <button onClick={() => handleDelete(index)}>
+              Delete
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
